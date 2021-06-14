@@ -53,7 +53,7 @@ $ cd your_project_folder
 $ git rm environment.yml  # if exists
 $ echo "environment.yml" >> .gitignore
 $ git add environment.yml.meta
-$ git submodule add https://github.com/silvanmelchior/cme_parser
+$ git submodule add https://github.com/Alaffia-Technology-Solutions/cme_parser.git
 $ git commit -m "cme parser added"
 $ git push
 ```
