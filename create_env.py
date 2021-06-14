@@ -32,14 +32,9 @@ class MetaFileParser:
 
     def __init__(self):
         self._flags = []
-        self._vars = {}
+        self._vars = os.environ
         self.file_buffer = None
         self.line_cnt = None
-
-    def read_argparse(self, flags_list, var_list):
-        self._flags = flags_list
-        for attr, val in var_list:
-            self._vars[attr] = val
 
     def parse_file(self, file_in):
         self.file_buffer = []
@@ -128,7 +123,8 @@ class MetaFileParser:
         if '%' in name:
             raise ValueError('Flags can\'t have default values')
         else:
-            return name in self._flags
+            # flag defaults to false unless positively set to truthy value
+            return name in self._vars and bool(self._vars[name])
 
     def _eval_expression(self, name):
         if name == 'platform':
@@ -159,10 +155,6 @@ def main():
                            help='specify meta environment input file')
     argparser.add_argument('-o', '--output',
                            help='specify environment output file')
-    argparser.add_argument('-f', '--flag', type=str, action='append', default=[],
-                           help='set custom flag for parsing')
-    argparser.add_argument('-v', '--variable', type=str, nargs=2, action='append', default=[],
-                           help='define custom variable for parsing')
     argparser.add_argument('-q', '--quiet', action='store_true',
                            help='quietly overwrite output if already exists')
     argparser.add_argument('-p', '--parse-only', action='store_true',
@@ -173,7 +165,6 @@ def main():
 
     # Create parser instance
     metafileparser = MetaFileParser()
-    metafileparser.read_argparse(args.flag, args.variable)
 
     # Get input file
     dir_path = os.path.dirname(os.path.realpath(__file__))

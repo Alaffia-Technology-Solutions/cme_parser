@@ -12,7 +12,7 @@ name: demo_env
 dependencies:
   - numpy=1.16.4
   - tensorflow=1.14.0
-  - tensorflow-gpu=1.14.0 [use_gpu]
+  - tensorflow-gpu=1.14.0 [USE_GPU]
   - winreg-helpers [platform == win32]
 ```
 
@@ -22,7 +22,7 @@ can be used to set up a conda environment with
 
 or
 
-`python create_env.py --flag use_gpu` (B).
+`USE_GPU=1 python create_env.py` (B).
 
 In (A), the conda package *tensorflow-gpu* is not installed. In both cases, *winreg-helpers* is only installed on windows platforms.
 
@@ -37,8 +37,8 @@ channels:
   - defaults
 dependencies:
   - numpy=1.16.4
-  - matplotlib=3.1.0 [allow_plot and plot_tool == matplotlib]
-  - ggplot=0.11.5    [allow_plot and plot_tool == ggplot]
+  - matplotlib=3.1.0 [ALLOW_PLOT and PLOT_TOOL == matplotlib]
+  - ggplot=0.11.5    [ALLOW_PLOT and PLOT_TOOL == ggplot]
   - pip=19.1.1
   - some-linux-package=1.2.3 [platform startswith linux]
   - pip:
@@ -60,7 +60,7 @@ $ git push
 
 If you now execute (in the case of using a submodule)
 
-`python cme_parser/create_env.py --flag allow_plot --variable plot_tool matplotlib`
+`ALLOW_PLOT=1 PLOT_TOOL=matplotlib python cme_parser/create_env.py`
 
 in your project folder, CME Parser will find the meta-env file and create **environment.yml**.
 In general, if not specified differently with a `--output` argument, the parser will write the output into the same location as the input, removing *.meta* from the filename.
@@ -86,8 +86,10 @@ Conditions can be combined by adding `and` and `or` in between them.
 Furthermore, `not` can be added in front of a condition. The precedence order is `or` (highest), `and`, `not` (lowest), so e.g. `a and not b` is evaluated as `a and (not b)`.
 Brackets to enforce another evaluation order are currently not supported.
 
-Flags are evaluated as *false* per default, except given to the parser with `-f flag_name`.
-Variables have to be given to the parser with `-v var_name var_value`, otherwise an error is risen.
+Functionally there is no difference between flags and variables -- both are environment variables. The difference is in the usage --
+if specifying only a name as a condition, it is treated as a flag, otherwise it is treated as a variable, according to the rules below.
+Flags are evaluated as *false* per default, except if set in the environment to a Python-truthy value.
+Variables have to be set in the environment, otherwise an error is risen.
 An exception are variables of the form  `var_name%value`, which are interpreted as variable `var_name` with default value `value`.
 Furthermore, the special variable `platform` is reserved and populated with the result of `sys.platform`.
 
@@ -98,8 +100,6 @@ Furthermore, the special variable `platform` is reserved and populated with the 
 | -h  | --help | show usage help message |
 | -i  | --input | specify meta environment input file |
 | -o  | --output | specify environment output file |
-| -f  | --flag | set custom flag for parsing |
-| -v  | --variable | define custom variable for parsing |
 | -q  | --quiet | quietly overwrite output if already exists |
 | -p  | --parse-only | do not invoke conda afterwards |
 | -c  | --no-comment | do not add auto-generated comment to output |
